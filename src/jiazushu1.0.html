@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>树</title>
+	<script src="https://cdn.bootcss.com/echarts/4.3.0-rc.2/echarts.js"></script>
+	<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+	<link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+	<div id="container" style="width: 1600px;height:700px;"></div>
+</body>
+	<div class="input-group" style="width: 100%;height:100%;display:flex;justify-content:center;">
+        <textarea  style="height:300px;width: 500px;" class="form-control" placeholder="请输入师生信息" id="inputs"></textarea>
+    </div>
+    <span class="input-group-btn "><button class="btn btn-primary" onclick="print()">搜索<tton></span>
+	
+	<script type="text/javascript">
+			// str="导师：张三\n2016级博士生：天一、王二、吴五\n2015级硕士生：李四、王五、许六\n2016级硕士生：刘一、李二、李三\n2017级本科生：刘六、琪七、司四" 
+
+			function print(){
+				str=document.getElementById("inputs").value;
+				// alert(str);
+							arrstr=str.split('\n');
+			var next=new Map;
+			var level=new Map;
+			var f=new Map;
+			var x=["博士生", "硕士生", "本科生"];
+			var map=new Map();
+			var vi=[];
+			map["导师"]=4;
+			map["博士生"]=3;
+			map["硕士生"]=2;
+			map["本科生"]=1;
+		//	console.log(map["导师"]);
+		//	console.log(map["博士生"]);
+			for(var i=0;i<arrstr.length;)
+			{
+				var j;
+				for(j=i;j<arrstr.length;j++)
+				{
+					if(arrstr[j]=="")
+					{
+						break;
+					}
+				}
+				var item=arrstr[i].split('：');
+				var tp=item[1];
+				next[tp]=[];
+				level[tp]=item[0];
+			//	console.log(tp);
+				vi.push(tp);
+				for(var l=i+1;l<j;l++)
+				{
+					for(var val of x)
+					{
+						//console.log(val);
+						if(arrstr[l].indexOf(val)!=-1)
+						{
+							var item1=arrstr[l].split('：');
+							var z=item1[0]+tp;
+							// console.log(z);
+							next[tp].push(z);
+							level[z]=val;
+							next[z]=[];
+							f[z]=1;
+							vi.push(z);
+							break;
+						}
+					}
+					
+					var s=item1[1].split('、');
+					for(var val of s)
+					{
+						// console.log(val);
+							next[z].push(val);
+							f[val]=1;
+							level[val]=item1[0];
+							vi.push(val);
+					}
+				}
+				i=j+1;
+				
+			}
+			for(var val of vi)
+			{
+				
+				if(f[val]==null)
+				{
+				//	console.log(val);
+					var root=dfs(val,-1);
+					// console.log(root);
+				}
+			}
+			function dfs(u,fa)
+			{
+				var ss;
+				ss={};
+				ss.name =u;
+				ss.children=[];
+				var v=next[u];
+				if(v==null)
+				{
+					return ss;
+				}
+				for(var i=0;i<v.length;i++)
+				{
+					ss.children.push(dfs(v[i],u));
+				}
+				if(u.indexOf(fa)!=-1)
+				{
+					var t=u.substring(0, u.indexOf(fa));
+					ss.name =t;
+				}
+				return ss;
+			}
+			//转化成树
+			var  myChart = echarts.init(document.getElementById("container"))
+			myChart.setOption(option = {
+        		tooltip: {
+            	trigger: 'item',
+           		triggerOn: 'mousemove'
+        		},
+        		series: [
+	            	{
+	                type: 'tree',
+	                data: [root],
+	                top: '1%',
+	                left: '7%',
+	                bottom: '1%',
+	                right: '20%',
+	                symbolSize: 7,
+	                label: {
+	                    normal: {
+	                        position: 'left',
+	                        verticalAlign: 'middle',
+	                        align: 'right',
+	                        fontSize: 9
+	                    }
+	                },
+	                leaves: {
+	                    label: {
+	                        normal: {
+	                            position: 'right',
+	                            verticalAlign: 'middle',
+	                            align: 'left'
+	                        }
+	                    }
+	                },
+	                expandAndCollapse: true,
+	                animationDuration: 550,
+	                animationDurationUpdate: 750
+	            	}
+	        		]
+    		});
+			}
+			
+// 			var data = {
+//     "name": "flare",
+//     "children": [
+//         {
+//             "name": "flex",
+//             "children": [
+//                 {"name": "FlareVis", "value": 4116}
+//             ]
+//         },
+//         {
+//             "name": "scale",
+//             "children": [
+//                 {"name": "ScaleType", "value": 1821},
+//                 {"name": "TimeScale", "value": 5833}
+//            ]
+//         },
+//         {
+//             "name": "display",
+//             "children": [
+//                 {"name": "DirtySprite", "value": 8833}
+//            ]
+//         }
+//     ]
+// };
+			//转化成json
+
+	</script>
+</html>
